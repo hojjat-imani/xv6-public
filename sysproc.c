@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "processMigration.h"
 
 int
 sys_fork(void)
@@ -88,4 +89,20 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+sys_pause(void)
+{
+cprintf("pause called!\n");
+save();
+return 0;
+}
+
+int
+sys_resume(void)
+{
+cprintf("resume called!\n");
+load();
+return 0;
 }
