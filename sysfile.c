@@ -14,6 +14,9 @@
 #include "file.h"
 #include "fcntl.h"
 
+
+
+
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -440,3 +443,5 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+

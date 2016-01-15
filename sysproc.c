@@ -8,6 +8,7 @@
 #include "proc.h"
 #include "processMigration.h"
 
+
 int
 sys_fork(void)
 {
@@ -94,15 +95,17 @@ sys_uptime(void)
 int
 sys_pause(void)
 {
-cprintf("pause called!\n");
-save();
-return 0;
+  int  fd;
+  argint(0 , &fd);
+  save(fd);
+  return 0;
 }
 
 int
 sys_resume(void)
 {
-cprintf("resume called!\n");
-load();
-return 0;
+  int  fd;
+  argint(0 , &fd);
+  load(fd);
+  return 0;
 }
