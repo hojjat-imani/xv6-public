@@ -45,7 +45,7 @@ void load(int fd) {
 	memmove(buf, temp, PGSIZE);
 	cprintf("%s\n", buf);
     }
-  cprintf("KIR\n");
+
     makeProcess(pgdir, process);
 
     cprintf("end of load.\n");
