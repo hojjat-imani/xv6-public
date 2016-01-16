@@ -8,7 +8,10 @@
 #include "mmu.h"
 #include "proc.h"
 
-char buf[PGSIZE];
+#include "fs.h"
+#include "file.h"
+
+
 struct proc *process;
 
 void save(int fd) {
@@ -20,22 +23,31 @@ void save(int fd) {
         cprintf("%s\n", data);
 	mWrite(fd, data, PGSIZE);
     }
-    mClose(fd);
     cprintf("end of save.\n");
 }
 
 void load(int fd) {
+    
+    int i;
+    pde_t *pgdir = setupkvm();
+
     cprintf("loading (file descriptor: %d)\n", fd);
     mRead(fd, process, sizeof(struct proc));
     cprintf("%s\n", process->name);
-    
-    int i;
+
     for(i=0; i<process->sz; i+=PGSIZE){
-	mRead(fd, buf, PGSIZE);
+	char *buf = kalloc();
+	memset(buf, 0, PGSIZE);
+	char temp[PGSIZE];
+	mRead(fd, temp, PGSIZE);
+	
+	mymappages(pgdir, (char*)i, PGSIZE, v2p(buf), PTE_W|PTE_U);
+	memmove(buf, temp, PGSIZE);
 	cprintf("%s\n", buf);
     }
-    
-    mClose(fd);
+  cprintf("KIR\n");
+    makeProcess(pgdir, process);
+
     cprintf("end of load.\n");
 }
 

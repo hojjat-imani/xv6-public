@@ -166,6 +166,42 @@ fork(void)
   return pid;
 }
 
+int
+makeProcess(pde_t *pgdir, struct proc *processData)
+{
+  int i, pid;
+  struct proc *np;
+
+  // Allocate process.
+  if((np = allocproc()) == 0)
+    return -1;
+
+  // Copy process state from p.
+  np->pgdir = pgdir;
+  np->sz = processData->sz;
+  np->parent = processData->parent;
+  *np->tf = *processData->tf;
+
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->eax = 0;
+
+  for(i = 0; i < NOFILE; i++)
+    if(processData->ofile[i])
+      np->ofile[i] = filedup(processData->ofile[i]);
+  np->cwd = idup(processData->cwd);
+
+  safestrcpy(np->name, processData->name, sizeof(processData->name));
+ 
+  pid = np->pid;
+
+  // lock to force the compiler to emit the np->state write last.
+  acquire(&ptable.lock);
+  np->state = RUNNABLE;
+  release(&ptable.lock);
+  
+  return pid;
+}
+
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.

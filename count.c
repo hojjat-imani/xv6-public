@@ -3,20 +3,28 @@
 #include "fcntl.h"
 
 int main (){
-int i = 1;
+  int pid, i;
 
-while(1){
+  pid = fork();
+  if(pid == 0){
 
-	printf(1, "%d\n", i);
-	if(i == 1){
-		pause(open("procFile", O_CREATE|O_RDWR));
-	}
-	if(i == 3){
-		resume(open("procFile", O_RDONLY));
-	}
-	sleep(100);
-	i++;
-}
+	for(i=0; i<100; i++){
+		printf(1, "%d\n", i);
+		if(i == 2){
+			pause(open("procFile", O_CREATE|O_RDWR));
+			exit();
+		}
+		sleep(100);
+	}	
+  } else if(pid > 0){  	
+	wait();
+	resume(open("procFile", O_RDONLY));
+	wait();
+	exit();
+  } else {
+    printf(1, "fork() failed\n");
+    exit();
+  }
 
 exit();
 }
