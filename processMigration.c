@@ -8,21 +8,22 @@
 #include "mmu.h"
 #include "proc.h"
 
-char buf[12];
+//char buf[512];
+struct proc *process;
 
 void save(int fd) {
 //cprintf("prc number: %d\n", proc->pid);
 //cprintf("cpu id: %d\n", cpu->id);
     cprintf("saving (file descriptor: %d)\n", fd);
-    mWrite(fd, "process data", 12);
+    mWrite(fd, proc, sizeof(struct proc));
     mClose(fd);
     cprintf("\nend of save.\n");
 }
 
 void load(int fd) {
     cprintf("loading (file descriptor: %d)\n", fd);
-    mRead(fd, buf, 12);
-    cprintf("%s", &buf);
+    mRead(fd, process, sizeof(struct proc));
+    cprintf("%s", process->name);
     mClose(fd);
     cprintf("\nend of load.\n");
 }
