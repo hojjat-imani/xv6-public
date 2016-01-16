@@ -351,6 +351,18 @@ uva2ka(pde_t *pgdir, char *uva)
   return (char*)p2v(PTE_ADDR(*pte));
 }
 
+char*
+getPgData(pde_t *pgdir, uint pgNum)
+{
+  pte_t *pte;
+  
+  if((pte = walkpgdir(pgdir, (void *) pgNum, 0)) == 0)
+      panic("copyuvm: pte should exist");
+  if(!(*pte & PTE_P))
+      panic("copyuvm: page not present");
+  return (char*)p2v(PTE_ADDR(*pte));
+}
+
 // Copy len bytes from p to user address va in page table pgdir.
 // Most useful when pgdir is not the current page table.
 // uva2ka ensures this only works for PTE_U pages.

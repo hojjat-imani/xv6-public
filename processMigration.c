@@ -8,24 +8,35 @@
 #include "mmu.h"
 #include "proc.h"
 
-//char buf[512];
+char buf[PGSIZE];
 struct proc *process;
 
 void save(int fd) {
-//cprintf("prc number: %d\n", proc->pid);
-//cprintf("cpu id: %d\n", cpu->id);
     cprintf("saving (file descriptor: %d)\n", fd);
     mWrite(fd, proc, sizeof(struct proc));
+    int i;
+    for(i=0; i < proc->sz; i+=PGSIZE){
+	char *data = getPgData(proc->pgdir, i);
+        cprintf("%s\n", data);
+	mWrite(fd, data, PGSIZE);
+    }
     mClose(fd);
-    cprintf("\nend of save.\n");
+    cprintf("end of save.\n");
 }
 
 void load(int fd) {
     cprintf("loading (file descriptor: %d)\n", fd);
     mRead(fd, process, sizeof(struct proc));
-    cprintf("%s", process->name);
+    cprintf("%s\n", process->name);
+    
+    int i;
+    for(i=0; i<process->sz; i+=PGSIZE){
+	mRead(fd, buf, PGSIZE);
+	cprintf("%s\n", buf);
+    }
+    
     mClose(fd);
-    cprintf("\nend of load.\n");
+    cprintf("end of load.\n");
 }
 
 int mWrite(int fd, void *addr, int n) {
